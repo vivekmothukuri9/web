@@ -119,34 +119,40 @@ function App() {
   return (
     <>
       <div style={{
-        background: '#e3f2fd',
+        background: '#0f172a',
         padding: '15px',
         textAlign: 'center',
-        borderBottom: '2px solid #2196f3',
-        color: '#0d47a1',
+        borderBottom: '2px solid #3b82f6',
+        color: '#f8fafc',
         fontSize: '15px',
-        fontWeight: '500',
+        fontWeight: '600',
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
-        gap: '15px'
+        gap: '20px',
+        boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)'
       }}>
-        <span>🚀 Add extension for AI help</span>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+          <span style={{ background: '#3b82f6', padding: '4px 8px', borderRadius: '4px', fontSize: '12px' }}>PRO</span>
+          <span>Enhance your research with <strong>Grasp AI</strong> Companion</span>
+        </div>
         <button
           onClick={() => {
-            alert("Security Note: Browsers don't allow opening the extensions page directly.\n\nSteps:\n1. Copy 'chrome://extensions' and paste in a new tab.\n2. Turn on 'Developer mode' (top-right).\n3. Click 'Load unpacked'.\n4. Select the 'public/extension' folder in this project directory.");
+            alert("🚀 Grasp AI Installation Steps:\n\n1. Copy folder: 'public/extension' in this project.\n2. Open: chrome://extensions in a new tab.\n3. Enable: 'Developer mode' (Top-right).\n4. Click: 'Load unpacked' and select the folder.\n\nNote: Ensure your local server is running (node src/server.js).");
           }}
           style={{
-            background: '#2196f3',
+            background: '#3b82f6',
             color: 'white',
             border: 'none',
-            padding: '8px 16px',
-            borderRadius: '4px',
+            padding: '10px 20px',
+            borderRadius: '6px',
             cursor: 'pointer',
-            fontWeight: 'bold'
+            fontWeight: 'bold',
+            transition: 'all 0.2s',
+            boxShadow: '0 0 15px rgba(59, 130, 246, 0.4)'
           }}
         >
-          Add Extension (Guide)
+          Add Grasp AI to Chrome
         </button>
       </div>
       <AppShell />
