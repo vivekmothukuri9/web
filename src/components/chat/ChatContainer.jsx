@@ -1,6 +1,6 @@
 import React, { useContext, useEffect, useRef, useState } from 'react';
 import { AppContext } from '../../context/AppProvider';
-import { User, Copy, ThumbsUp, ThumbsDown, RotateCcw, MoreHorizontal, Check, Volume2, Flag, Trash2 } from 'lucide-react';
+import { User, Copy, ThumbsUp, ThumbsDown, RotateCcw, MoreHorizontal, Check, Volume2, Flag, Trash2, FileUp, Play, Pause } from 'lucide-react';
 import './ChatContainer.css';
 
 const CodeBlock = ({ code }) => {
@@ -104,16 +104,22 @@ const UserMessage = ({ content, attachment }) => {
           {attachment && (
             <div className="message-attachment">
               {attachment.type === 'image' ? (
-                <img src={attachment.url} alt="attachment" className="chat-img-preview" />
+                <img src={attachment.url} alt="attachment" className="chat-img-preview" onClick={() => window.open(attachment.url, '_blank')} style={{ cursor: 'pointer', borderRadius: '8px', maxWidth: '100%', marginBottom: '10px' }} />
+              ) : attachment.type === 'voice' || (attachment.name && attachment.name.endsWith('.mp3')) ? (
+                <div className="audio-player-container" style={{ margin: '10px 0' }}>
+                  <audio controls src={attachment.url} style={{ height: '35px', width: '200px' }}>
+                    Your browser does not support audio.
+                  </audio>
+                </div>
               ) : (
-                <div className="file-attachment-card">
+                <div className="file-attachment-card" style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '10px', background: 'var(--bg-hover)', borderRadius: '8px', marginBottom: '10px' }}>
                   <FileUp size={16} />
-                  <span>{attachment.name || 'File Attachment'}</span>
+                  <a href={attachment.url} target="_blank" rel="noreferrer" style={{ fontSize: '14px', color: 'var(--accent-color)' }}>{attachment.name || 'File Attachment'}</a>
                 </div>
               )}
             </div>
           )}
-          <p>{content}</p>
+          {content && <p>{content}</p>}
         </div>
       </div>
     </div>

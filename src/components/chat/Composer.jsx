@@ -10,13 +10,15 @@ const Composer = () => {
   const [attachmentMenuOpen, setAttachmentMenuOpen] = useState(false);
   const [isRecording, setIsRecording] = useState(false);
   const [cameraActive, setCameraActive] = useState(false);
-  const [previewMedia, setPreviewMedia] = useState(null); // { type: 'image'|'file', file: File, url: string, name: string }
+  const [previewMedia, setPreviewMedia] = useState(null); // { type: 'image'|'file'|'voice', file: File, url: string, name: string }
   const [isUploading, setIsUploading] = useState(false);
 
   const textareaRef = useRef(null);
   const fileInputRef = useRef(null);
   const imageInputRef = useRef(null);
   const videoRef = useRef(null);
+  const mediaRecorderRef = useRef(null);
+  const audioChunksRef = useRef([]);
 
   // Auto-resize textarea
   useEffect(() => {
@@ -27,7 +29,7 @@ const Composer = () => {
   }, [inputText]);
 
   const uploadToSupabase = async (file, type) => {
-    const fileName = `${Date.now()}_${file.name}`;
+    const fileName = `${Date.now()}_${file.name || 'recording.mp3'}`;
     const filePath = `chat_uploads/${fileName}`;
 
     const { data, error } = await supabase.storage
@@ -55,7 +57,7 @@ const Composer = () => {
 
     // 1. If no active chat, create one
     if (!currentChatId) {
-      const chatTitle = inputText.trim().substring(0, 30) || "New Chat";
+      const chatTitle = inputText.trim().substring(0, 30) || (previewMedia ? `Shared ${previewMedia.type}` : "New Chat");
       const { data: newChat, error: chatError } = await supabase
         .from('chats')
         .insert([{ title: chatTitle }])
@@ -69,7 +71,8 @@ const Composer = () => {
       }
       currentChatId = newChat.id;
       setActiveChat(currentChatId);
-      fetchChats(); // Refresh sidebar
+      // Wait a bit then refresh sidebar
+      setTimeout(fetchChats, 500);
     }
 
     // 2. Upload attachment if exists
@@ -97,7 +100,7 @@ const Composer = () => {
         content: inputText,
         attachment: attachmentUrl ? { type: previewMedia.type, url: attachmentUrl, name: previewMedia.name } : null
       };
-      setMessages([...messages, uiMsg]);
+      setMessages(prev => [...prev, uiMsg]);
     }
 
     // Reset UI
@@ -153,7 +156,6 @@ const Composer = () => {
         videoRef.current.srcObject = stream;
       }
     } catch (err) {
-      console.error("Camera error:", err);
       alert("Could not access camera");
       setCameraActive(false);
     }
@@ -166,19 +168,55 @@ const Composer = () => {
     canvas.getContext('2d').drawImage(videoRef.current, 0, 0);
 
     canvas.toBlob((blob) => {
-      const file = new File([blob], "camera_capture.png", { type: "image/png" });
+      const file = new File([blob], `capture_${Date.now()}.png`, { type: "image/png" });
       setPreviewMedia({
         type: 'image',
         file: file,
         url: URL.createObjectURL(file),
-        name: 'camera_capture.png'
+        name: file.name
       });
 
-      // Stop camera
       const stream = videoRef.current.srcObject;
-      stream.getTracks().forEach(track => track.stop());
+      if (stream) stream.getTracks().forEach(track => track.stop());
       setCameraActive(false);
     }, 'image/png');
+  };
+
+  const startRecording = async () => {
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      const mediaRecorder = new MediaRecorder(stream);
+      mediaRecorderRef.current = mediaRecorder;
+      audioChunksRef.current = [];
+
+      mediaRecorder.ondataavailable = (e) => {
+        if (e.data.size > 0) audioChunksRef.current.push(e.data);
+      };
+
+      mediaRecorder.onstop = () => {
+        const audioBlob = new Blob(audioChunksRef.current, { type: 'audio/mpeg' });
+        const file = new File([audioBlob], `voice_${Date.now()}.mp3`, { type: 'audio/mpeg' });
+        setPreviewMedia({
+          type: 'voice',
+          file: file,
+          url: URL.createObjectURL(audioBlob),
+          name: file.name
+        });
+        stream.getTracks().forEach(track => track.stop());
+      };
+
+      mediaRecorder.start();
+      setIsRecording(true);
+    } catch (err) {
+      alert("Microphone access denied");
+    }
+  };
+
+  const stopRecording = () => {
+    if (mediaRecorderRef.current && isRecording) {
+      mediaRecorderRef.current.stop();
+      setIsRecording(false);
+    }
   };
 
   const handleKeyDown = (e) => {
@@ -190,20 +228,8 @@ const Composer = () => {
 
   return (
     <div className="composer-container">
-      {/* Hidden Inputs */}
-      <input
-        type="file"
-        ref={fileInputRef}
-        style={{ display: 'none' }}
-        onChange={(e) => handleFileChange(e, 'file')}
-      />
-      <input
-        type="file"
-        accept="image/*"
-        ref={imageInputRef}
-        style={{ display: 'none' }}
-        onChange={(e) => handleFileChange(e, 'image')}
-      />
+      <input type="file" ref={fileInputRef} style={{ display: 'none' }} onChange={(e) => handleFileChange(e, 'file')} />
+      <input type="file" accept="image/*" ref={imageInputRef} style={{ display: 'none' }} onChange={(e) => handleFileChange(e, 'image')} />
 
       {cameraActive && (
         <div className="camera-preview-overlay">
@@ -225,19 +251,11 @@ const Composer = () => {
         <div className="recording-ui animate-fade-in">
           <div className="recording-indicator">
             <div className="recording-dot animate-pulse"></div>
-            <span>Recording Voice...</span>
+            <span>Recording...</span>
           </div>
           <div className="recording-actions">
-            <button className="icon-btn" onClick={() => setIsRecording(false)}>
-              <X size={20} />
-            </button>
-            <button className="icon-btn stop-btn" onClick={() => {
-               const mockFile = new File(["voice_data"], "voice_note.mp3", { type: "audio/mpeg" });
-               setPreviewMedia({ type: 'file', file: mockFile, url: '#', name: 'voice_note.mp3' });
-               setIsRecording(false);
-            }}>
-              <Square size={20} className="text-danger" />
-            </button>
+            <button className="icon-btn" onClick={() => setIsRecording(false)}><X size={20} /></button>
+            <button className="icon-btn stop-btn" onClick={stopRecording}><Square size={20} className="text-danger" /></button>
           </div>
         </div>
       ) : (
@@ -251,9 +269,7 @@ const Composer = () => {
                   <div className="file-icon-preview"><FileUp size={16} /></div>
                 )}
                 <span className="preview-name">{previewMedia.name}</span>
-                <button className="remove-preview" onClick={() => setPreviewMedia(null)}>
-                  <X size={14} />
-                </button>
+                <button className="remove-preview" onClick={() => setPreviewMedia(null)}><X size={14} /></button>
               </div>
             </div>
           )}
@@ -261,13 +277,7 @@ const Composer = () => {
           <div className="composer-row">
             <div className="composer-actions-left">
               <div className="attachment-wrapper">
-                <button
-                  className="composer-icon-btn"
-                  onClick={() => setAttachmentMenuOpen(!attachmentMenuOpen)}
-                >
-                  <Plus size={20} />
-                </button>
-
+                <button className="composer-icon-btn" onClick={() => setAttachmentMenuOpen(!attachmentMenuOpen)}><Plus size={20} /></button>
                 {attachmentMenuOpen && (
                   <div className="attachment-menu animate-fade-in">
                     <button onClick={() => fileInputRef.current.click()}><FileUp size={16} /> Upload file</button>
@@ -291,17 +301,9 @@ const Composer = () => {
 
             <div className="composer-actions-right">
               {(!inputText.trim() && !previewMedia) ? (
-                <button className="composer-icon-btn" onClick={() => setIsRecording(true)}>
-                  <Mic size={20} />
-                </button>
+                <button className="composer-icon-btn" onClick={startRecording}><Mic size={20} /></button>
               ) : (
-                <button
-                  className={`send-btn animate-fade-in ${isUploading ? 'opacity-50' : ''}`}
-                  onClick={handleSend}
-                  disabled={isUploading}
-                >
-                  <Send size={18} />
-                </button>
+                <button className={`send-btn animate-fade-in ${isUploading ? 'opacity-50' : ''}`} onClick={handleSend} disabled={isUploading}><Send size={18} /></button>
               )}
             </div>
           </div>
