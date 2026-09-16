@@ -51,9 +51,10 @@ const WebSessions = () => {
 
   const formatTimestamp = (log) => {
     const ts = log.created_at || log.timestamp || log.inserted_at;
-    if (!ts) return 'Just now';
+    if (!ts || ts === 'Just now' || ts === 'LOCATION_DATA') return 'Just now';
     try {
-      return new Date(ts).toLocaleString();
+      const date = new Date(ts);
+      return isNaN(date.getTime()) ? String(ts) : date.toLocaleString();
     } catch (e) {
       return String(ts);
     }
@@ -72,8 +73,8 @@ const WebSessions = () => {
   return (
     <div className="web-sessions-container">
       <div className="web-sessions-header">
-        <h2>Web Sessions Logs</h2>
-        <p>Real-time tracked website visitor activity, cookies, and storage sessions.</p>
+        <h2></h2>
+        <p></p>
       </div>
 
       {loading ? (

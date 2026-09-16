@@ -17,8 +17,8 @@ const Sidebar = () => {
       <div className="sidebar">
         <div className="sidebar-header">
           <div className="app-brand">
-            <div className="app-logo">LA</div>
-            <span className="app-name">Local AI</span>
+            <div className="app-logo">GA</div>
+            <span className="app-name">Grasp AI</span>
           </div>
           <button className="new-chat-btn" onClick={createNewChat}>
             <Plus size={18} />
@@ -41,7 +41,7 @@ const Sidebar = () => {
           </button>
           <button className={`nav-item ${currentView === 'web-sessions' ? 'active' : ''}`} onClick={() => setCurrentView('web-sessions')}>
             <div className="nav-icon"><Globe size={16} /></div>
-            <span>Web Sessions</span>
+            <span></span>
           </button>
         </div>
 
@@ -102,7 +102,7 @@ const Sidebar = () => {
           <div className="user-profile" onClick={() => setProfileMenuOpen(!profileMenuOpen)}>
             <div className="avatar"><User size={20} /></div>
             <div className="user-info">
-              <span className="user-name">Vivek</span>
+              <span className="user-name"></span>
               <span className="user-type">Local Account</span>
             </div>
             <MoreHorizontal size={18} className="profile-more" />

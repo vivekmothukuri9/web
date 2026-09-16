@@ -11,7 +11,7 @@ const Header = () => {
   const currentChat = chats.find(c => c.id === activeChat);
 
   const models = [
-    { id: 'Local AI', desc: 'Fast, everyday model' },
+    { id: 'Grasp AI', desc: 'Fast, everyday model' },
     { id: 'Fast AI', desc: 'Optimized for speed' },
     { id: 'Smart AI', desc: 'Advanced reasoning' },
     { id: 'Custom Model', desc: 'Your fine-tuned model' }

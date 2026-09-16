@@ -8,7 +8,7 @@ export const AppProvider = ({ children }) => {
   const [activeChat, setActiveChat] = useState(null);
   const [messages, setMessages] = useState([]);
   const [chats, setChats] = useState([]);
-  const [model, setModel] = useState('Local AI');
+  const [model, setModel] = useState('Grasp AI');
 
   // Modals
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
