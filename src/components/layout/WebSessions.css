@@ -1,0 +1,212 @@
+.web-sessions-container {
+  padding: 2rem;
+  height: 100%;
+  overflow-y: auto;
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
+}
+
+.web-sessions-header {
+  margin-bottom: 2rem;
+}
+
+.web-sessions-header h2 {
+  font-size: 1.5rem;
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+}
+
+.web-sessions-header p {
+  color: var(--text-secondary);
+  font-size: 0.875rem;
+}
+
+.sessions-loading, .sessions-empty {
+  padding: 3rem;
+  text-align: center;
+  color: var(--text-secondary);
+  background-color: var(--bg-secondary);
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--border-color);
+}
+
+.table-responsive {
+  width: 100%;
+  overflow-x: auto;
+  background-color: var(--bg-primary);
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--border-color);
+  box-shadow: var(--shadow-sm);
+}
+
+.sessions-table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+  font-size: 0.875rem;
+}
+
+.sessions-table th {
+  background-color: var(--bg-secondary);
+  padding: 1rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+  border-bottom: 1px solid var(--border-color);
+}
+
+.sessions-table td {
+  padding: 1rem;
+  border-bottom: 1px solid var(--border-color);
+  vertical-align: middle;
+}
+
+.sessions-table tr:last-child td {
+  border-bottom: none;
+}
+
+.sessions-table tr:hover {
+  background-color: var(--bg-secondary);
+}
+
+.url-cell {
+  max-width: 400px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-weight: 500;
+}
+
+.cell-icon {
+  display: inline-block;
+  margin-right: 0.5rem;
+  color: var(--text-tertiary);
+  vertical-align: middle;
+}
+
+.timestamp-cell {
+  color: var(--text-secondary);
+  white-space: nowrap;
+}
+
+.view-details-btn {
+  background-color: var(--accent-color);
+  color: #ffffff;
+  padding: 0.5rem 1rem;
+  border-radius: var(--radius-md);
+  font-size: 0.8125rem;
+  font-weight: 500;
+  transition: background-color var(--transition-fast);
+}
+
+.view-details-btn:hover {
+  background-color: var(--accent-hover);
+}
+
+/* Modal Styling */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+  backdrop-filter: blur(2px);
+}
+
+.details-modal {
+  background-color: var(--bg-primary);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-xl);
+  width: 90%;
+  max-width: 650px;
+  max-height: 85vh;
+  display: flex;
+  flex-direction: column;
+  box-shadow: var(--shadow-lg);
+  animation: fadeIn 0.2s ease;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: scale(0.95); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+.modal-header {
+  padding: 1.25rem 1.5rem;
+  border-bottom: 1px solid var(--border-color);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.modal-header h3 {
+  font-size: 1.25rem;
+  font-weight: 600;
+}
+
+.close-modal-btn {
+  color: var(--text-secondary);
+  padding: 0.25rem;
+  border-radius: var(--radius-full);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background-color var(--transition-fast);
+}
+
+.close-modal-btn:hover {
+  background-color: var(--bg-hover);
+  color: var(--text-primary);
+}
+
+.modal-body {
+  padding: 1.5rem;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.modal-info-item {
+  font-size: 0.875rem;
+  display: flex;
+  gap: 0.5rem;
+}
+
+.modal-url {
+  word-break: break-all;
+  color: var(--accent-color);
+}
+
+.json-section {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.json-section h4 {
+  font-size: 0.95rem;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 0.375rem;
+  color: var(--text-secondary);
+}
+
+.json-display {
+  background-color: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  padding: 1rem;
+  font-family: 'Courier New', Courier, monospace;
+  font-size: 0.8125rem;
+  overflow-x: auto;
+  white-space: pre-wrap;
+  word-break: break-all;
+  max-height: 200px;
+  color: var(--text-primary);
+}

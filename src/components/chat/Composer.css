@@ -1,0 +1,164 @@
+.composer-container {
+  width: 100%;
+  max-width: 800px;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.composer-input-wrapper {
+  display: flex;
+  align-items: flex-end;
+  background-color: var(--bg-primary);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-xl);
+  padding: 0.5rem;
+  box-shadow: var(--shadow-md);
+  transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
+}
+
+.composer-input-wrapper:focus-within {
+  border-color: var(--text-tertiary);
+  box-shadow: var(--shadow-lg);
+}
+
+.composer-textarea {
+  flex: 1;
+  border: none;
+  background: transparent;
+  color: var(--text-primary);
+  font-size: 1rem;
+  padding: 0.5rem;
+  resize: none;
+  max-height: 200px;
+  overflow-y: auto;
+  line-height: 1.5;
+  outline: none;
+}
+
+.composer-textarea::placeholder {
+  color: var(--text-tertiary);
+}
+
+.composer-actions-left, .composer-actions-right {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding-bottom: 0.25rem;
+}
+
+.composer-icon-btn {
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--radius-full);
+  color: var(--text-secondary);
+  transition: background-color var(--transition-fast);
+}
+
+.composer-icon-btn:hover {
+  background-color: var(--bg-hover);
+  color: var(--text-primary);
+}
+
+.send-btn {
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--radius-full);
+  background-color: var(--text-primary);
+  color: var(--bg-primary);
+  transition: transform var(--transition-fast);
+}
+
+.send-btn:hover {
+  transform: scale(1.05);
+}
+
+.send-btn:active {
+  transform: scale(0.95);
+}
+
+.attachment-wrapper {
+  position: relative;
+}
+
+.attachment-menu {
+  position: absolute;
+  bottom: 100%;
+  left: 0;
+  background-color: var(--bg-primary);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  padding: 0.5rem;
+  box-shadow: var(--shadow-lg);
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  margin-bottom: 0.75rem;
+  width: 160px;
+  z-index: 20;
+}
+
+.attachment-menu button {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.5rem 0.75rem;
+  border-radius: var(--radius-sm);
+  font-size: 14px;
+  color: var(--text-secondary);
+}
+
+.attachment-menu button:hover {
+  background-color: var(--bg-hover);
+  color: var(--text-primary);
+}
+
+.composer-footer {
+  text-align: center;
+}
+
+.composer-footer p {
+  font-size: 11px;
+  color: var(--text-tertiary);
+}
+
+.recording-ui {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background-color: var(--bg-primary);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-xl);
+  padding: 0.75rem 1rem;
+  box-shadow: var(--shadow-md);
+}
+
+.recording-indicator {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  color: var(--danger-color);
+  font-weight: 500;
+}
+
+.recording-dot {
+  width: 10px;
+  height: 10px;
+  background-color: var(--danger-color);
+  border-radius: 50%;
+}
+
+.recording-actions {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.text-danger {
+  color: var(--danger-color);
+}
