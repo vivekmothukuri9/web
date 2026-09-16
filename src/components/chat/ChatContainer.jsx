@@ -95,12 +95,26 @@ const AssistantMessage = ({ content, isLoading }) => {
   );
 };
 
-const UserMessage = ({ content }) => {
+const UserMessage = ({ content, attachment }) => {
   return (
     <div className="message user-message animate-fade-in">
       <div className="message-avatar user-avatar"><User size={20} /></div>
       <div className="message-body">
-        <div className="message-content"><p>{content}</p></div>
+        <div className="message-content">
+          {attachment && (
+            <div className="message-attachment">
+              {attachment.type === 'image' ? (
+                <img src={attachment.url} alt="attachment" className="chat-img-preview" />
+              ) : (
+                <div className="file-attachment-card">
+                  <FileUp size={16} />
+                  <span>{attachment.name || 'File Attachment'}</span>
+                </div>
+              )}
+            </div>
+          )}
+          <p>{content}</p>
+        </div>
       </div>
     </div>
   );
@@ -138,7 +152,7 @@ const ChatContainer = () => {
         <div className="chat-content">
           {messages.map(msg => (
             msg.role === 'user' 
-              ? <UserMessage key={msg.id} content={msg.content} />
+              ? <UserMessage key={msg.id} content={msg.content} attachment={msg.attachment} />
               : <AssistantMessage key={msg.id} content={msg.content} isLoading={msg.isLoading} />
           ))}
         </div>

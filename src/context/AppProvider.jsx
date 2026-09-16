@@ -1,4 +1,5 @@
-import React, { createContext, useState, useEffect } from 'react';
+import React, { createContext, useState, useEffect, useCallback } from 'react';
+import { supabase } from '../supabase';
 
 export const AppContext = createContext();
 
@@ -16,6 +17,53 @@ export const AppProvider = ({ children }) => {
   const [isShortcutsOpen, setIsShortcutsOpen] = useState(false);
 
   const [currentView, setCurrentView] = useState('chat'); // 'chat' or 'web-sessions'
+
+  // Fetch Chats from Supabase
+  const fetchChats = useCallback(async () => {
+    const { data, error } = await supabase
+      .from('chats')
+      .select('*')
+      .order('created_at', { ascending: false });
+
+    if (!error && data) {
+      setChats(data);
+    }
+  }, []);
+
+  // Fetch Messages for active chat
+  const fetchMessages = useCallback(async (chatId) => {
+    if (!chatId) return;
+    const { data, error } = await supabase
+      .from('messages')
+      .select('*')
+      .eq('chat_id', chatId)
+      .order('created_at', { ascending: true });
+
+    if (!error && data) {
+      // Map database fields to UI component fields
+      const formattedMessages = data.map(m => ({
+        id: m.id,
+        role: m.role,
+        content: m.content,
+        attachment: m.attachment_url ? {
+          type: m.attachment_type,
+          url: m.attachment_url,
+          name: m.attachment_url.split('/').pop()
+        } : null
+      }));
+      setMessages(formattedMessages);
+    }
+  }, []);
+
+  useEffect(() => {
+    fetchChats();
+  }, [fetchChats]);
+
+  useEffect(() => {
+    if (activeChat) {
+      fetchMessages(activeChat);
+    }
+  }, [activeChat, fetchMessages]);
 
   // Apply Theme
   useEffect(() => {
@@ -48,13 +96,6 @@ export const AppProvider = ({ children }) => {
 
   const selectChat = (id) => {
     setActiveChat(id);
-    const chat = chats.find(c => c.id === id);
-    if (chat) {
-      setMessages([
-        { id: 1, role: 'user', content: 'Can you tell me more about ' + chat.title + '?' },
-        { id: 2, role: 'assistant', content: 'Sure! What would you like to know about ' + chat.title + '?' }
-      ]);
-    }
     if (window.innerWidth < 768) setIsSidebarOpen(false);
   };
 
@@ -71,7 +112,8 @@ export const AppProvider = ({ children }) => {
         isSearchOpen, setIsSearchOpen,
         isShortcutsOpen, setIsShortcutsOpen,
         createNewChat, selectChat,
-        currentView, setCurrentView
+        currentView, setCurrentView,
+        fetchChats
       }}
     >
       {children}

@@ -1,15 +1,17 @@
 import React, { useState, useContext, useRef, useEffect } from 'react';
 import { AppContext } from '../../context/AppProvider';
+import { supabase } from '../../supabase';
 import { Plus, Mic, Send, Paperclip, Camera, FileUp, X, Square, Image as ImageIcon } from 'lucide-react';
 import './Composer.css';
 
 const Composer = () => {
-  const { setMessages, activeChat, setActiveChat, messages } = useContext(AppContext);
+  const { setMessages, activeChat, setActiveChat, messages, fetchChats } = useContext(AppContext);
   const [inputText, setInputText] = useState('');
   const [attachmentMenuOpen, setAttachmentMenuOpen] = useState(false);
   const [isRecording, setIsRecording] = useState(false);
   const [cameraActive, setCameraActive] = useState(false);
-  const [previewMedia, setPreviewMedia] = useState(null); // { type: 'image'|'file', url: string, name: string }
+  const [previewMedia, setPreviewMedia] = useState(null); // { type: 'image'|'file', file: File, url: string, name: string }
+  const [isUploading, setIsUploading] = useState(false);
 
   const textareaRef = useRef(null);
   const fileInputRef = useRef(null);
@@ -24,41 +26,109 @@ const Composer = () => {
     }
   }, [inputText]);
 
-  const handleSend = () => {
-    if (!inputText.trim() && !previewMedia) return;
+  const uploadToSupabase = async (file, type) => {
+    const fileName = `${Date.now()}_${file.name}`;
+    const filePath = `chat_uploads/${fileName}`;
 
-    if (!activeChat) {
-      setActiveChat(Date.now());
+    const { data, error } = await supabase.storage
+      .from('chat-media')
+      .upload(filePath, file);
+
+    if (error) {
+      console.error('Upload error:', error);
+      return null;
     }
 
-    const newMessage = {
-      id: Date.now(),
-      role: 'user',
-      content: inputText,
-      attachment: previewMedia
-    };
+    const { data: publicUrlData } = supabase.storage
+      .from('chat-media')
+      .getPublicUrl(filePath);
 
-    setMessages([...messages, newMessage]);
+    return publicUrlData.publicUrl;
+  };
+
+  const handleSend = async () => {
+    if ((!inputText.trim() && !previewMedia) || isUploading) return;
+
+    setIsUploading(true);
+    let currentChatId = activeChat;
+    let attachmentUrl = null;
+
+    // 1. If no active chat, create one
+    if (!currentChatId) {
+      const chatTitle = inputText.trim().substring(0, 30) || "New Chat";
+      const { data: newChat, error: chatError } = await supabase
+        .from('chats')
+        .insert([{ title: chatTitle }])
+        .select()
+        .single();
+
+      if (chatError) {
+        alert("Error creating chat");
+        setIsUploading(false);
+        return;
+      }
+      currentChatId = newChat.id;
+      setActiveChat(currentChatId);
+      fetchChats(); // Refresh sidebar
+    }
+
+    // 2. Upload attachment if exists
+    if (previewMedia && previewMedia.file) {
+      attachmentUrl = await uploadToSupabase(previewMedia.file, previewMedia.type);
+    }
+
+    // 3. Save User Message to Supabase
+    const { data: savedMsg, error: msgError } = await supabase
+      .from('messages')
+      .insert([{
+        chat_id: currentChatId,
+        role: 'user',
+        content: inputText,
+        attachment_url: attachmentUrl,
+        attachment_type: previewMedia?.type || null
+      }])
+      .select()
+      .single();
+
+    if (!msgError) {
+      const uiMsg = {
+        id: savedMsg.id,
+        role: 'user',
+        content: inputText,
+        attachment: attachmentUrl ? { type: previewMedia.type, url: attachmentUrl, name: previewMedia.name } : null
+      };
+      setMessages([...messages, uiMsg]);
+    }
+
+    // Reset UI
     setInputText('');
     setPreviewMedia(null);
     setAttachmentMenuOpen(false);
+    setIsUploading(false);
 
-    // Reset textarea height
-    if (textareaRef.current) {
-      textareaRef.current.style.height = 'auto';
+    if (textareaRef.current) textareaRef.current.style.height = 'auto';
+
+    // 4. Generate & Save Mock AI Response
+    const loadingId = "loading_" + Date.now();
+    setMessages(prev => [...prev, { id: loadingId, role: 'assistant', content: '...', isLoading: true }]);
+
+    const aiResponseContent = `I received your ${attachmentUrl ? previewMedia.type : 'message'}. How can I help you further?`;
+
+    const { data: aiMsg, error: aiError } = await supabase
+      .from('messages')
+      .insert([{
+        chat_id: currentChatId,
+        role: 'assistant',
+        content: aiResponseContent
+      }])
+      .select()
+      .single();
+
+    if (!aiError) {
+      setMessages(prev => prev.map(msg =>
+        msg.id === loadingId ? { id: aiMsg.id, role: 'assistant', content: aiMsg.content, isLoading: false } : msg
+      ));
     }
-
-    // Mock AI response
-    const loadingId = Date.now() + 1;
-    setTimeout(() => {
-      setMessages(prev => [...prev, { id: loadingId, role: 'assistant', content: '...', isLoading: true }]);
-      
-      setTimeout(() => {
-        setMessages(prev => prev.map(msg => 
-          msg.id === loadingId ? { id: loadingId, role: 'assistant', content: `Processed your request. ${previewMedia ? `Received ${previewMedia.type}: ${previewMedia.name}` : ''}`, isLoading: false } : msg
-        ));
-      }, 1500);
-    }, 500);
   };
 
   const handleFileChange = (e, type) => {
@@ -66,6 +136,7 @@ const Composer = () => {
     if (file) {
       setPreviewMedia({
         type: type,
+        file: file,
         url: URL.createObjectURL(file),
         name: file.name
       });
@@ -93,18 +164,21 @@ const Composer = () => {
     canvas.width = videoRef.current.videoWidth;
     canvas.height = videoRef.current.videoHeight;
     canvas.getContext('2d').drawImage(videoRef.current, 0, 0);
-    const dataUrl = canvas.toDataURL('image/png');
 
-    setPreviewMedia({
-      type: 'image',
-      url: dataUrl,
-      name: 'camera_capture.png'
-    });
+    canvas.toBlob((blob) => {
+      const file = new File([blob], "camera_capture.png", { type: "image/png" });
+      setPreviewMedia({
+        type: 'image',
+        file: file,
+        url: URL.createObjectURL(file),
+        name: 'camera_capture.png'
+      });
 
-    // Stop camera
-    const stream = videoRef.current.srcObject;
-    stream.getTracks().forEach(track => track.stop());
-    setCameraActive(false);
+      // Stop camera
+      const stream = videoRef.current.srcObject;
+      stream.getTracks().forEach(track => track.stop());
+      setCameraActive(false);
+    }, 'image/png');
   };
 
   const handleKeyDown = (e) => {
@@ -158,7 +232,8 @@ const Composer = () => {
               <X size={20} />
             </button>
             <button className="icon-btn stop-btn" onClick={() => {
-               setPreviewMedia({ type: 'file', url: '#', name: 'voice_note.mp3' });
+               const mockFile = new File(["voice_data"], "voice_note.mp3", { type: "audio/mpeg" });
+               setPreviewMedia({ type: 'file', file: mockFile, url: '#', name: 'voice_note.mp3' });
                setIsRecording(false);
             }}>
               <Square size={20} className="text-danger" />
@@ -206,20 +281,25 @@ const Composer = () => {
             <textarea
               ref={textareaRef}
               className="composer-textarea"
-              placeholder="Message Grasp AI"
+              placeholder={isUploading ? "Uploading..." : "Message Grasp AI"}
               value={inputText}
               onChange={(e) => setInputText(e.target.value)}
               onKeyDown={handleKeyDown}
+              disabled={isUploading}
               rows={1}
             />
 
             <div className="composer-actions-right">
-              {!inputText.trim() && !previewMedia ? (
+              {(!inputText.trim() && !previewMedia) ? (
                 <button className="composer-icon-btn" onClick={() => setIsRecording(true)}>
                   <Mic size={20} />
                 </button>
               ) : (
-                <button className="send-btn animate-fade-in" onClick={handleSend}>
+                <button
+                  className={`send-btn animate-fade-in ${isUploading ? 'opacity-50' : ''}`}
+                  onClick={handleSend}
+                  disabled={isUploading}
+                >
                   <Send size={18} />
                 </button>
               )}
