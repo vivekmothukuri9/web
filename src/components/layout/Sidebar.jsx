@@ -39,9 +39,6 @@ const Sidebar = () => {
             <div className="nav-icon"><Library size={16} /></div>
             <span>Library</span>
           </button>
-          <button className={`nav-item ${currentView === 'web-sessions' ? 'active' : ''}`} onClick={() => setCurrentView('web-sessions')}>
-            <div className="nav-icon"><Globe size={16} /></div>
-          </button>
         </div>
 
         <div className="sidebar-history">

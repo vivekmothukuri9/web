@@ -17,19 +17,15 @@ const AppShell = () => {
       <main className="main-content">
         <Header />
         <div className="content-area">
-          {currentView === 'web-sessions' ? (
-            <WebSessions />
-          ) : activeChat ? (
+          {activeChat ? (
             <ChatContainer />
           ) : (
             <WelcomeScreen />
           )}
         </div>
-        {currentView !== 'web-sessions' && (
-          <div className="composer-wrapper">
-            <Composer />
-          </div>
-        )}
+        <div className="composer-wrapper">
+          <Composer />
+        </div>
       </main>
     </div>
   );

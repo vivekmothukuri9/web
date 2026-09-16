@@ -41,14 +41,12 @@ export const AppProvider = ({ children }) => {
   }, []);
 
   const createNewChat = () => {
-    setCurrentView('chat');
     setActiveChat(null);
     setMessages([]);
     if (window.innerWidth < 768) setIsSidebarOpen(false);
   };
 
   const selectChat = (id) => {
-    setCurrentView('chat');
     setActiveChat(id);
     const chat = chats.find(c => c.id === id);
     if (chat) {
