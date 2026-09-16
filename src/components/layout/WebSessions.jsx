@@ -54,9 +54,10 @@ const WebSessions = () => {
     if (!ts || ts === 'Just now' || ts === 'LOCATION_DATA') return 'Just now';
     try {
       const date = new Date(ts);
-      return isNaN(date.getTime()) ? String(ts) : date.toLocaleString();
+      if (isNaN(date.getTime())) return 'Just now';
+      return date.toLocaleString();
     } catch (e) {
-      return String(ts);
+      return 'Just now';
     }
   };
 

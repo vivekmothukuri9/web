@@ -100,7 +100,7 @@ const Composer = () => {
           <textarea
             ref={textareaRef}
             className="composer-textarea"
-            placeholder="Message Local AI"
+            placeholder="Message Grasp AI"
             value={inputText}
             onChange={(e) => setInputText(e.target.value)}
             onKeyDown={handleKeyDown}
@@ -121,7 +121,7 @@ const Composer = () => {
         </div>
       )}
       <div className="composer-footer">
-        <p>Local AI can make mistakes. Consider verifying important information.</p>
+        <p>Grasp AI can make mistakes. Consider verifying important information.</p>
       </div>
     </div>
   );
