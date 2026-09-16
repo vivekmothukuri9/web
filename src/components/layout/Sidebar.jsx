@@ -35,10 +35,6 @@ const Sidebar = () => {
             <div className="nav-icon"><Search size={16} /></div>
             <span>Search</span>
           </button>
-          <button className="nav-item">
-            <div className="nav-icon"><Library size={16} /></div>
-            <span>Library</span>
-          </button>
         </div>
 
         <div className="sidebar-history">
@@ -104,9 +100,6 @@ const Sidebar = () => {
             <div className="profile-menu">
               <button onClick={() => { setIsSettingsOpen(true); setProfileMenuOpen(false); }}>
                 <Settings size={16} /> Settings
-              </button>
-              <button>
-                <Sun size={16} /> Theme
               </button>
               <button>
                 <LogOut size={16} /> Log out

@@ -8,13 +8,104 @@
 
 .composer-input-wrapper {
   display: flex;
-  align-items: flex-end;
+  flex-direction: column;
   background-color: var(--bg-primary);
   border: 1px solid var(--border-color);
   border-radius: var(--radius-xl);
   padding: 0.5rem;
   box-shadow: var(--shadow-md);
   transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
+}
+
+.composer-row {
+  display: flex;
+  align-items: flex-end;
+  width: 100%;
+}
+
+.media-preview-bar {
+  display: flex;
+  padding: 0.5rem;
+  border-bottom: 1px solid var(--border-color);
+  margin-bottom: 0.25rem;
+}
+
+.preview-item {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: var(--bg-hover);
+  padding: 0.25rem 0.5rem;
+  border-radius: var(--radius-md);
+  max-width: 200px;
+}
+
+.preview-item img {
+  width: 40px;
+  height: 40px;
+  object-fit: cover;
+  border-radius: var(--radius-sm);
+}
+
+.preview-name {
+  font-size: 12px;
+  color: var(--text-primary);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.remove-preview {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-tertiary);
+  cursor: pointer;
+}
+
+.camera-preview-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.8);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.camera-box {
+  background: #000;
+  padding: 10px;
+  border-radius: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.camera-box video {
+  width: 100%;
+  max-width: 500px;
+  border-radius: 8px;
+}
+
+.camera-controls {
+  display: flex;
+  justify-content: space-around;
+}
+
+.capture-btn {
+  background: #3b82f6;
+  color: white;
+  padding: 8px 20px;
+  border-radius: 20px;
+}
+
+.close-btn {
+  background: #ef4444;
+  color: white;
+  padding: 8px 20px;
+  border-radius: 20px;
 }
 
 .composer-input-wrapper:focus-within {
