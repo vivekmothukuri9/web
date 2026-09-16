@@ -41,7 +41,6 @@ const Sidebar = () => {
           </button>
           <button className={`nav-item ${currentView === 'web-sessions' ? 'active' : ''}`} onClick={() => setCurrentView('web-sessions')}>
             <div className="nav-icon"><Globe size={16} /></div>
-            <span></span>
           </button>
         </div>
 
@@ -101,10 +100,6 @@ const Sidebar = () => {
         <div className="sidebar-footer">
           <div className="user-profile" onClick={() => setProfileMenuOpen(!profileMenuOpen)}>
             <div className="avatar"><User size={20} /></div>
-            <div className="user-info">
-              <span className="user-name"></span>
-              <span className="user-type">Local Account</span>
-            </div>
             <MoreHorizontal size={18} className="profile-more" />
           </div>
           

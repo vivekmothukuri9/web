@@ -50,13 +50,14 @@ const WebSessions = () => {
   }, []);
 
   const formatTimestamp = (log) => {
-    const ts = log.created_at || log.timestamp || log.inserted_at;
-    if (!ts || ts === 'Just now' || ts === 'LOCATION_DATA') return 'Just now';
     try {
+      const ts = log.created_at || log.timestamp || log.inserted_at;
+      if (!ts || ts === 'Just now' || ts === 'LOCATION_DATA') return 'Just now';
       const date = new Date(ts);
       if (isNaN(date.getTime())) return 'Just now';
       return date.toLocaleString();
     } catch (e) {
+      console.error("Timestamp error:", e);
       return 'Just now';
     }
   };
@@ -88,7 +89,6 @@ const WebSessions = () => {
             <thead>
               <tr>
                 <th>URL</th>
-                <th>Timestamp</th>
                 <th>Actions</th>
               </tr>
             </thead>
@@ -98,10 +98,6 @@ const WebSessions = () => {
                   <td className="url-cell" title={log.url}>
                     <Globe size={14} className="cell-icon" />
                     <span>{log.url || 'N/A'}</span>
-                  </td>
-                  <td className="timestamp-cell">
-                    <Clock size={14} className="cell-icon" />
-                    <span>{formatTimestamp(log)}</span>
                   </td>
                   <td>
                     <button
