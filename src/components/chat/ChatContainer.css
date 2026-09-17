@@ -184,36 +184,40 @@
 
 .thinking-indicator .dot:nth-child(1) { animation-delay: -0.32s; }
 .message-attachment {
+  margin-top: 10px;
   margin-bottom: 10px;
-  max-width: 100%;
 }
 
 .chat-img-preview {
-  max-width: 300px;
-  max-height: 300px;
-  border-radius: 8px;
-  cursor: pointer;
+  max-width: 100%;
+  max-height: 350px;
+  border-radius: 12px;
   border: 1px solid var(--border-color);
-  transition: transform 0.2s;
-}
-
-.chat-img-preview:hover {
-  transform: scale(1.02);
+  object-fit: contain;
 }
 
 .audio-player-container {
-  background: var(--bg-hover);
-  padding: 8px;
-  border-radius: 20px;
   display: flex;
   align-items: center;
-  gap: 10px;
+  background: var(--bg-hover);
+  padding: 10px;
+  border-radius: 25px;
   border: 1px solid var(--border-color);
-  width: fit-content;
 }
 
 .audio-player-container audio {
-  height: 30px;
+  height: 32px;
+  filter: invert(var(--audio-invert, 0));
+}
+
+.file-attachment-card {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px;
+  background: var(--bg-hover);
+  border-radius: 10px;
+  border: 1px solid var(--border-color);
 }
 
 .scroll-to-bottom {

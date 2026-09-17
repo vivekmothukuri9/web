@@ -99,6 +99,31 @@ export const AppProvider = ({ children }) => {
     if (window.innerWidth < 768) setIsSidebarOpen(false);
   };
 
+  const deleteChat = async (id) => {
+    const { error } = await supabase
+      .from('chats')
+      .delete()
+      .eq('id', id);
+
+    if (!error) {
+      if (activeChat === id) {
+        createNewChat();
+      }
+      fetchChats();
+    }
+  };
+
+  const renameChat = async (id, newTitle) => {
+    const { error } = await supabase
+      .from('chats')
+      .update({ title: newTitle })
+      .eq('id', id);
+
+    if (!error) {
+      fetchChats();
+    }
+  };
+
   return (
     <AppContext.Provider
       value={{
@@ -113,7 +138,8 @@ export const AppProvider = ({ children }) => {
         isShortcutsOpen, setIsShortcutsOpen,
         createNewChat, selectChat,
         currentView, setCurrentView,
-        fetchChats
+        fetchChats,
+        deleteChat, renameChat
       }}
     >
       {children}
