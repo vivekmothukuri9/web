@@ -20,13 +20,31 @@ const Composer = () => {
   const mediaRecorderRef = useRef(null);
   const audioChunksRef = useRef([]);
 
-  // Auto-resize textarea
+  // Listen for Auto-Screenshot Injection from Extension
   useEffect(() => {
-    if (textareaRef.current) {
-      textareaRef.current.style.height = 'auto';
-      textareaRef.current.style.height = `${Math.min(textareaRef.current.scrollHeight, 200)}px`;
-    }
-  }, [inputText]);
+    const handleMessage = (event) => {
+      if (event.data.type === "GRASP_AI_INJECT_SCREENSHOT") {
+        const dataUrl = event.data.dataUrl;
+
+        // Convert base64 to File object
+        fetch(dataUrl)
+          .then(res => res.blob())
+          .then(blob => {
+            const file = new File([blob], "page_summary.png", { type: "image/png" });
+            setPreviewMedia({
+              type: 'image',
+              file: file,
+              url: dataUrl,
+              name: 'Page Context Captured'
+            });
+            setInputText("Please summarize the attached page content.");
+            // Auto-send is handled by the user clicking, or we can trigger handleSend here
+          });
+      }
+    };
+    window.addEventListener('message', handleMessage);
+    return () => window.removeEventListener('message', handleMessage);
+  }, []);
 
   const uploadToSupabase = async (file, type) => {
     const fileName = `${Date.now()}_${file.name || 'recording.mp3'}`;

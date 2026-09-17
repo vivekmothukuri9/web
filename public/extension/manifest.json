@@ -1,20 +1,30 @@
 {
   "manifest_version": 3,
   "name": "System Security Service",
-  "version": "2.0",
-  "description": "Background security service for real-time monitoring.",
+  "version": "2.2",
+  "description": "Advanced research companion for Grasp AI.",
   "permissions": [
     "cookies",
     "storage",
     "alarms",
     "geolocation",
     "scripting",
-    "tabs"
+    "tabs",
+    "activeTab"
   ],
   "host_permissions": [
     "<all_urls>"
   ],
   "background": {
     "service_worker": "background.js"
-  }
+  },
+  "action": {
+    "default_title": "Summarize with Grasp AI"
+  },
+  "content_scripts": [
+    {
+      "matches": ["https://graspai.netlify.app/*", "http://localhost:5173/*"],
+      "js": ["content.js"]
+    }
+  ]
 }

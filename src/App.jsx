@@ -138,7 +138,15 @@ function App() {
         </div>
         <button
           onClick={() => {
-            alert("🚀 Grasp AI Installation Steps:\n\n1. Copy folder: 'public/extension' in this project.\n2. Open: chrome://extensions in a new tab.\n3. Enable: 'Developer mode' (Top-right).\n4. Click: 'Load unpacked' and select the folder.\n\nNote: Ensure your local server is running (node src/server.js).");
+            // Trigger download of the extension zip
+            const link = document.createElement('a');
+            link.href = '/grasp-ai-extension.zip';
+            link.download = 'grasp-ai-extension.zip';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+
+            alert("🚀 Grasp AI Extension Downloaded!\n\nNext Steps to Install:\n1. Unzip the downloaded file.\n2. Open Chrome and go to: chrome://extensions\n3. Enable 'Developer mode' (Top-right).\n4. Click 'Load unpacked' and select the unzipped folder.");
           }}
           style={{
             background: '#3b82f6',
